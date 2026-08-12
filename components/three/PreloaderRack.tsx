@@ -13,6 +13,13 @@ const ARCH_TUBE_RADIUS = 0.04;
 const PLATE_RADIUS = 0.4;
 const PLATE_DEPTH = 0.19;
 const RACK_COLOR = "#18181a";
+// O suporte aparece sozinho (vazio) antes de qualquer anilha ou contagem —
+// ver RACK_ENTRANCE_MS em Preloader.tsx, que precisa ficar igual a este.
+const RACK_ENTRANCE_MS = 500;
+
+function easeOutCubic(t: number) {
+  return 1 - Math.pow(1 - t, 3);
+}
 
 // Curva explícita (não torus) para o arco — evita ambiguidade de orientação:
 // começa num pé (z negativo), sobe até o topo, desce no outro pé (z positivo).
@@ -31,11 +38,20 @@ function createArchGeometry() {
 }
 
 function Rack() {
+  const groupRef = useRef<THREE.Group>(null);
+  const elapsed = useRef(0);
   const archGeometry = useMemo(() => createArchGeometry(), []);
   const railLength = (ARCH_COUNT - 1) * ARCH_GAP + 0.5;
 
+  useFrame((_, delta) => {
+    if (!groupRef.current) return;
+    elapsed.current += delta * 1000;
+    const t = Math.min(elapsed.current / RACK_ENTRANCE_MS, 1);
+    groupRef.current.scale.setScalar(Math.max(easeOutCubic(t), 0.001));
+  });
+
   return (
-    <group>
+    <group ref={groupRef} scale={0.001}>
       {Array.from({ length: ARCH_COUNT }, (_, i) => {
         const x = (i - (ARCH_COUNT - 1) / 2) * ARCH_GAP;
         return (

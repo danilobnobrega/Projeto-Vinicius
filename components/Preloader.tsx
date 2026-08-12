@@ -27,11 +27,15 @@ function twoPhasePercent(t: number) {
 // Pequeno atraso pra troca do número acompanhar o instante em que a anilha
 // termina de encaixar visualmente, não o instante em que o valor real muda.
 const DISPLAY_DELAY_MS = 180;
+// O suporte aparece sozinho (vazio) antes de a contagem começar — precisa
+// ficar igual ao RACK_ENTRANCE_MS em components/three/PreloaderRack.tsx.
+const RACK_ENTRANCE_MS = 500;
 
 export default function Preloader({ onFinish }: { onFinish: () => void }) {
   const { setSuppressed } = useCursorVisibility();
   const [percent, setPercent] = useState(0);
   const [displayPercent, setDisplayPercent] = useState(0);
+  const [showPercent, setShowPercent] = useState(false);
   const [exiting, setExiting] = useState(false);
 
   useLayoutEffect(() => {
@@ -41,13 +45,14 @@ export default function Preloader({ onFinish }: { onFinish: () => void }) {
 
   useEffect(() => {
     let rafId: number;
-    const start = performance.now();
+    let start = 0;
     let milestone = 0;
     const pendingTimeouts: number[] = [];
 
     function tick(now: number) {
       const t = Math.min((now - start) / DURATION_MS, 1);
       const newPercent = Math.round(twoPhasePercent(t));
+
       setPercent(newPercent);
 
       if (newPercent < FAST_PHASE_PERCENT) {
@@ -72,8 +77,16 @@ export default function Preloader({ onFinish }: { onFinish: () => void }) {
       }
     }
 
-    rafId = requestAnimationFrame(tick);
+    // espera o suporte terminar de aparecer (sozinho, vazio) antes de
+    // começar a contar — a contagem nasce junto com o suporte, não antes.
+    const startTimeout = window.setTimeout(() => {
+      setShowPercent(true);
+      start = performance.now();
+      rafId = requestAnimationFrame(tick);
+    }, RACK_ENTRANCE_MS);
+
     return () => {
+      window.clearTimeout(startTimeout);
       cancelAnimationFrame(rafId);
       pendingTimeouts.forEach(window.clearTimeout);
     };
@@ -97,9 +110,14 @@ export default function Preloader({ onFinish }: { onFinish: () => void }) {
 
       <PreloaderRack percent={percent} />
 
-      <span className="mt-2 font-display text-sm tracking-[0.3em] tabular-nums text-bone/50">
+      <motion.span
+        className="mt-2 font-display text-sm tracking-[0.3em] tabular-nums text-bone/50"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: showPercent ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+      >
         {String(displayPercent).padStart(2, "0")}%
-      </span>
+      </motion.span>
     </motion.div>
   );
 }
