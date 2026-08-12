@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  /* base */
+  --color-bone: #f2eee4;
+  --color-bone-dim: #e7e1d2;
+  --color-carbon: #17140f;
+  --color-carbon-soft: #221e17;
+  /* accents */
+  --color-bronze: #a8804f;
+  --color-bronze-bright: #c79b63;
+  --color-oxide: #7a3b2e;
+  --color-iron: #5c5648;
+}
+
+@theme inline {
+  --color-bone: var(--color-bone);
+  --color-bone-dim: var(--color-bone-dim);
+  --color-carbon: var(--color-carbon);
+  --color-carbon-soft: var(--color-carbon-soft);
+  --color-bronze: var(--color-bronze);
+  --color-bronze-bright: var(--color-bronze-bright);
+  --color-oxide: var(--color-oxide);
+  --color-iron: var(--color-iron);
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+}
+
+body {
+  background: var(--color-bone);
+  color: var(--color-carbon);
+}
+
+.cursor-none-custom,
+.cursor-none-custom * {
+  cursor: none !important;
+}
+
+/* grão sutil sobre toda a interface — textura de concreto/ferro, não decoração gratuita */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
