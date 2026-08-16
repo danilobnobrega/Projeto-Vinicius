@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Big_Shoulders, Manrope } from "next/font/google";
+import { Manrope } from "next/font/google";
+import localFont from "next/font/local";
 import CustomCursor from "@/components/CustomCursor";
 import { CursorVisibilityProvider } from "@/components/CursorVisibility";
 import "./globals.css";
 
-const display = Big_Shoulders({
+// Hospedada localmente: o Google trocou o hash desse arquivo no CDN deles e
+// a versão instalada do Next ainda aponta pro hash antigo (404 permanente),
+// então buscamos direto do próprio projeto em vez de depender do Google.
+const display = localFont({
+  src: "../public/fonts/big-shoulders-latin-var.woff2",
   variable: "--font-display",
-  subsets: ["latin", "latin-ext"],
-  weight: ["600", "700", "800", "900"],
+  weight: "600 900",
+  style: "normal",
 });
 
 const sans = Manrope({
@@ -28,7 +33,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="pt-BR"
-      className={`${display.variable} ${sans.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
+      className={`${display.variable} ${sans.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bone text-carbon font-sans">
         <div className="grain" aria-hidden="true" />

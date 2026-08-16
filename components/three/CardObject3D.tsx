@@ -7,7 +7,7 @@ import * as THREE from "three";
 const PLATE_COLOR = "#c79b63";
 const BAR_COLOR = "#241f17";
 
-function Barbell() {
+export function Barbell() {
   return (
     <>
       <mesh rotation={[0, 0, Math.PI / 2]}>
